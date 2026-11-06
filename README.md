@@ -2,8 +2,8 @@
 
 以 Kruskal、Prim、Union-Find 與 Min-Heap 為核心的資料結構教學網站。網站不是只顯示最後答案，而是先完整執行演算法、保存每一步快照，再讓使用者逐步播放、倒退或進入闖關模式作答。
 
-- 線上網站：部署完成後補上
-- GitHub：部署完成後補上
+- 線上網站：https://stxrduzz404.github.io/mst-learning-game/
+- GitHub：https://github.com/stxrduzz404/mst-learning-game
 
 ## 功能
 
