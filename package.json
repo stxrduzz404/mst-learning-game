@@ -1,0 +1,9 @@
+{
+  "name": "mst-learning-game",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "test": "node --test",
+    "start": "python -m http.server 5173"
+  }
+}

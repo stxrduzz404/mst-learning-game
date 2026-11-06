@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="zh-Hant-TW">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="最小生成樹互動教學：Kruskal、Prim、併查集、優先佇列、六個關卡與闖關模式。">
+  <meta name="theme-color" content="#eef2f6">
+  <title>最小生成樹｜資料結構互動教室</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script defer src="./js/mst-engine.js"></script>
+  <script defer src="./js/app.js"></script>
+</head>
+<body>
+  <a class="skip" href="#s2">跳到互動遊戲</a>
+  <div id="bootNotice" class="boot-notice" role="status">互動程式載入中；若此訊息持續出現，請重新整理頁面。</div>
+  <noscript><div class="fatal-notice">此網站需要 JavaScript 才能操作演算法遊戲，請在瀏覽器中啟用 JavaScript。</div></noscript>
+
+  <nav class="topbar" aria-label="章節導覽">
+    <a class="back" href="#top">◇ 資料結構互動教室</a>
+    <span class="chapter">24 · 最小生成樹</span>
+    <div class="navlinks">
+      <a href="#s0"><b>00</b> 定義</a><a href="#s1"><b>01</b> 玩法</a><a href="#s2"><b>02</b> 遊戲</a><a href="#s3"><b>03</b> 原理</a><a href="#s4"><b>04</b> 程式</a>
+    </div>
+  </nav>
+
+  <header class="hero" id="top">
+    <div class="hero-main">
+      <p class="overline">GAME 24 · MINIMUM SPANNING TREE</p>
+      <h1>最小生成樹</h1>
+      <p>學校要在六棟建築之間鋪網路線。要讓每一棟都連得上，又要讓總長度最短，該挑哪幾段？本頁用 Kruskal 與 Prim 兩種貪心演算法，一步一步把答案找出來。</p>
+    </div>
+    <dl class="hero-meta">
+      <div><dt>核心結構</dt><dd>加權無向圖<br>併查集／最小堆積</dd></div>
+      <div><dt>時間複雜度</dt><dd>O(E log E)<br>O(E log V)</dd></div>
+      <div><dt>校園圖答案</dt><dd class="answer">13</dd></div>
+    </dl>
+  </header>
+
+  <main>
+    <section class="lesson" id="s0">
+      <div class="section-no">00</div>
+      <div class="section-title"><div><p>DEFINITION</p><h2>先搞懂：MST 到底是什麼</h2></div><p>把名詞拆開理解，後面的演算法就不會只剩背步驟。</p></div>
+      <div class="definition-box">
+        <span>最小生成樹 · MINIMUM SPANNING TREE</span>
+        <p>在一張<strong>連通的加權無向圖</strong>裡，挑出部分邊，使<strong>所有頂點互相連通</strong>、<strong>沒有環</strong>，而且<strong>邊的權重總和最小</strong>。</p>
+        <div class="formula">V 個頂點 → 恰好 V − 1 條邊</div>
+      </div>
+      <div class="term-grid">
+        <article><span>01</span><h3>生成 Spanning</h3><p>答案涵蓋原圖的每一個頂點，不會漏掉任何地點。</p></article>
+        <article><span>02</span><h3>樹 Tree</h3><p>整張圖連通而且沒有環；多一條會成環，少一條會斷開。</p></article>
+        <article><span>03</span><h3>最小 Minimum</h3><p>比較所有生成樹後，選邊權重總和最低的那一棵。</p></article>
+        <article><span>04</span><h3>可能不唯一</h3><p>權重平手時可能有多棵 MST，但它們的最小總重一定相同。</p></article>
+      </div>
+      <div class="compare-note">
+        <div><b>MST</b><span>讓全部地點連起來的總成本最小</span><em>鋪網路、道路、管線</em></div>
+        <div class="not-equal">≠</div>
+        <div><b>最短路徑</b><span>只求起點到某個終點的距離最小</span><em>導航、路線規劃</em></div>
+      </div>
+    </section>
+
+    <section class="lesson alt" id="s1">
+      <div class="section-no">01</div>
+      <div class="section-title"><div><p>HOW TO PLAY</p><h2>怎麼玩・你會看到什麼</h2></div><p>先選關卡，再用下一步或自動播放觀察每個狀態。</p></div>
+      <div class="how-grid">
+        <article><b>演示模式</b><p>可以自由前進、後退、自動播放。每一步同步更新圖、資料結構、統計、歷程與程式高亮。</p></article>
+        <article><b>闖關模式</b><p>在關鍵步驟先回答下一條邊、代表節點、收下或跳過、目前總重等問題。</p></article>
+        <article><b>顏色規則</b><p><i class="dot orange"></i>正在檢查　<i class="dot green"></i>已收下　<i class="dot red"></i>成環或舊票淘汰。</p></article>
+        <article><b>鍵盤操作</b><p><kbd>→</kbd> 下一步　<kbd>←</kbd> 上一步　<kbd>Space</kbd> 播放／暫停。</p></article>
+      </div>
+      <div class="route">建議順序：Kruskal 校園圖 → Prim 從 A → Prim 換起點 F → 平手 → 路徑壓縮 → 最小生成森林</div>
+    </section>
+
+    <section class="game-section" id="s2">
+      <div class="game-section-head"><div><span>02</span><div><p>INTERACTIVE GAME</p><h2>開始玩</h2></div></div><p>選關卡 → 一步一步走 → 看邊被收下或跳過。</p></div>
+
+      <div class="mode-row">
+        <span>模式</span>
+        <div role="tablist" aria-label="模式">
+          <button class="mode-btn is-on" role="tab" aria-selected="true" data-mode="demo">演示模式</button>
+          <button class="mode-btn" role="tab" aria-selected="false" data-mode="quiz">闖關模式</button>
+        </div>
+        <div id="scoreBox" class="score-box" hidden><b id="score">0</b> 分　連對 <b id="streak">0</b>　正確率 <b id="accuracy">—</b></div>
+      </div>
+
+      <div class="level-row" aria-label="選擇關卡">
+        <span>關卡</span>
+        <div id="levelButtons" class="level-buttons">
+          <button class="level-btn is-on" data-level="0"><b>1 Kruskal</b><small>校園地圖</small></button>
+          <button class="level-btn" data-level="1"><b>2 Prim·A</b><small>從 A 長出去</small></button>
+          <button class="level-btn" data-level="2"><b>3 Prim·F</b><small>換起點 F</small></button>
+          <button class="level-btn" data-level="3"><b>4 平手</b><small>兩棵都最小</small></button>
+          <button class="level-btn" data-level="4"><b>5 成環</b><small>一直成環</small></button>
+          <button class="level-btn" data-level="5"><b>6 森林</b><small>不連通的圖</small></button>
+        </div>
+      </div>
+
+      <div class="game-shell">
+        <div class="visual-column">
+          <div class="panel-heading"><div><span id="algoLabel">KRUSKAL</span><h3 id="graphTitle">地圖＋Kruskal 的資料</h3></div><span id="graphNote">還沒排序</span></div>
+          <div class="graph-stage">
+            <svg id="graph" viewBox="0 0 680 420" role="img" aria-label="加權無向圖">
+              <g class="static-fallback" aria-hidden="true">
+                <text x="340" y="190" text-anchor="middle">互動圖載入中…</text>
+                <text x="340" y="220" text-anchor="middle">若持續空白，請重新整理</text>
+              </g>
+            </svg>
+          </div>
+          <div class="legend"><span><i class="lg-current"></i>正在看</span><span><i class="lg-tree"></i>已收下</span><span><i class="lg-reject"></i>已淘汰</span><span id="groupLegend">同色頂點＝同一組</span></div>
+        </div>
+
+        <div class="data-column">
+          <div class="data-block"><div class="data-title"><b id="leftTitle">EDGES · 輸入順序</b><span id="leftNote">還沒排序</span></div><div id="leftData" class="edge-list">
+            <div>A–B <b>4</b></div><div>A–C <b>2</b></div><div>B–C <b>1</b></div><div>B–D <b>5</b></div><div>C–D <b>8</b></div><div>C–E <b>10</b></div><div>D–E <b>2</b></div><div>D–F <b>6</b></div><div>E–F <b>3</b></div>
+          </div></div>
+          <div class="data-block"><div class="data-title"><b id="rightTitle">UNION-FIND · p[x]</b><span>資料結構</span></div><div id="rightData" class="parent-list"><p>還沒初始化。</p></div></div>
+        </div>
+
+        <div class="controls">
+          <button id="prevBtn" disabled>← 上一步</button><button id="nextBtn" class="primary">下一步 →</button><button id="playBtn">▶ 自動播放</button><button id="resetBtn">↺ 重來</button>
+          <div class="progress"><i id="progressBar"></i></div><b id="stepCount">0 / 0</b>
+        </div>
+
+        <div id="quizPanel" class="quiz-panel" hidden><p id="quizQuestion"></p><div id="quizOptions"></div><p id="quizFeedback"></p></div>
+
+        <div class="say-panel" id="sayPanel"><span id="stepBadge">START</span><div><small id="stepKind">STEP 00</small><h3 id="stepTitle">原本的圖：還沒挑任何邊</h3><p id="stepText">六棟建築要鋪網路線，總長度要最短。</p></div></div>
+
+        <aside class="stats-panel">
+          <div class="panel-heading"><div><span>LIVE STATE</span><h3>統計與歷程</h3></div><span id="statsAlgo">Kruskal</span></div>
+          <div class="stats-grid"><div><span>已收的邊</span><b id="statEdges">0 / 5</b></div><div><span>目前總重</span><b id="statTotal">0</b></div><div><span id="statAuxLabel">已看的邊</span><b id="statAux">0</b></div><div><span>淘汰數</span><b id="statRejected">0</b></div></div>
+          <ol id="history"><li>還沒開始。</li></ol>
+        </aside>
+
+        <div class="code-panel">
+          <div class="panel-heading"><div><span>C++17</span><h3 id="codeTitle">Kruskal——玩到哪，亮到哪</h3></div><span id="complexity">O(E log E)</span></div>
+          <ol id="codeLines">
+            <li>int p[100];</li><li>int find(int x) {</li><li>if (p[x] != x) p[x] = find(p[x]);</li><li>return p[x];</li><li>}</li><li>int kruskal(...) {</li><li>sort(edges.begin(), edges.end());</li><li>初始化 p[x]</li><li>total = cnt = 0;</li><li>逐邊檢查</li><li>find(u), find(v)</li><li>同組就跳過</li><li>不同組就合併</li><li>累加權重</li><li>收滿 V−1</li><li>}</li><li>return total;</li><li>}</li>
+          </ol>
+          <div id="codeExplain" class="code-explain">按「下一步」，這裡會用白話說明目前亮起的程式行。</div>
+        </div>
+      </div>
+
+      <details class="full-code"><summary>展開：完整 C++ 程式與逐行說明</summary><div class="full-code-grid"><pre id="fullCode"></pre><div id="lineDocs"></div></div></details>
+    </section>
+
+    <section class="lesson" id="s3">
+      <div class="section-no">03</div>
+      <div class="section-title"><div><p>WHY IT WORKS</p><h2>原理：兩種貪心視角</h2></div><p>做法不同，但兩者都建立在切割性質上。</p></div>
+      <div class="algorithm-cards">
+        <article><span>KRUSKAL</span><h3>全圖最便宜的邊先看</h3><ol><li>所有邊排序</li><li>兩端不同組就收下</li><li>同組代表會成環，跳過</li></ol><b>排序＋Union-Find</b></article>
+        <article><span>PRIM</span><h3>從目前的樹向外長</h3><ol><li>選起點</li><li>候選邊放進 Min-Heap</li><li>拿最小票，舊票丟棄</li></ol><b>鄰接表＋Priority Queue</b></article>
+      </div>
+      <div class="cut-property"><span>CUT PROPERTY</span><h3>切割兩側的最便宜跨越邊，是安全邊。</h3><p>把頂點任意分成左右兩群。若一棵 MST 沒用跨越兩群的最便宜邊，而用了更貴的跨越邊，就能把貴邊換成便宜邊，仍保持連通且總重更小，與「原本已最小」矛盾。</p></div>
+      <table class="algo-table"><thead><tr><th>比較</th><th>Kruskal</th><th>Prim</th></tr></thead><tbody><tr><th>視角</th><td>全圖的邊</td><td>目前樹向外的邊</td></tr><tr><th>資料結構</th><td>排序、併查集</td><td>鄰接表、最小堆積</td></tr><tr><th>時間</th><td>O(E log E)</td><td>O(E log V)</td></tr><tr><th>不連通圖</th><td>自然得到森林</td><td>每塊需重新選起點</td></tr></tbody></table>
+    </section>
+
+    <section class="lesson alt" id="s4">
+      <div class="section-no">04</div>
+      <div class="section-title"><div><p>PROGRAM DESIGN</p><h2>程式架構：先算完，再播放</h2></div><p>演算法與畫面分離，讓上一步不需要撰寫反向演算法。</p></div>
+      <div class="flow">
+        <div><b>LEVELS</b><span>節點、邊、演算法、起點</span></div><i>→</i><div><b>buildSteps</b><span>Kruskal／Prim 產生快照</span></div><i>→</i><div><b>steps[]</b><span>圖、資料結構、統計、題目</span></div><i>→</i><div><b>render</b><span>只顯示目前第 N 步</span></div>
+      </div>
+      <div class="module-grid"><article><h3>資料層</h3><p><code>mst-engine.js</code> 執行演算法並建立不可逆的步驟快照，完全不操作 DOM。</p></article><article><h3>畫面層</h3><p><code>app.js</code> 依目前快照更新 SVG、資料面板、統計、歷程與程式行。</p></article><article><h3>可靠載入</h3><p>使用傳統 <code>defer</code> 腳本，不依賴 ES Modules；保留靜態初始內容與明確錯誤提示。</p></article><article><h3>驗證層</h3><p>Node.js 測試涵蓋六關結果、成環、路徑壓縮、Prim 起點與最小生成森林。</p></article></div>
+    </section>
+  </main>
+
+  <footer><span>資料結構互動教室 · 24 最小生成樹</span><span>Kruskal / Prim / Union-Find / Min-Heap</span></footer>
+</body>
+</html>
